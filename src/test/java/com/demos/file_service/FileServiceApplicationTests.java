@@ -11,7 +11,7 @@ import org.springframework.test.context.ActiveProfiles;
 class FileServiceApplicationTests {
 
 	@Test
-	void contextLoads() {
+	void contextLoads() { // This test is empty because it is only used to verify that the application context loads successfully
 	}
 
 }
