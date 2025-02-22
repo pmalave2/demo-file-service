@@ -4,7 +4,7 @@ import com.demos.file_service.domain.Asset;
 
 import reactor.core.publisher.Mono;
 
-public interface PersistenceRepository {
+public interface StorageRepository {
 
-  Mono<Asset> save(Asset asset);
+  Mono<Asset> saveAsset(Asset asset);
 }

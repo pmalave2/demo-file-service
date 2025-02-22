@@ -1,6 +1,6 @@
 package com.demos.file_service.domain.service;
 
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.codec.multipart.FilePart;
 
 import com.demos.file_service.domain.Asset;
 
@@ -10,5 +10,5 @@ public interface FileService {
 
   Mono<Asset> uploadFile(String filename, String encodedFile, String contentType);
 
-  Mono<Asset> uploadFile(MultipartFile file);
+  Mono<Asset> uploadFile(FilePart file);
 }

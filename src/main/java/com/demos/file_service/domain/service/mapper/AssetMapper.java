@@ -2,6 +2,7 @@ package com.demos.file_service.domain.service.mapper;
 
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 import org.springframework.http.MediaType;
 
@@ -13,10 +14,16 @@ public interface AssetMapper {
 
   AssetMapper INSTANCE = Mappers.getMapper(AssetMapper.class);
 
-  @Mapping(target = "uploadDate", source = "creationDate")
-  Asset toDomain(AssetEntity entity);
+  Asset updateDomainFromEntity(@MappingTarget Asset asset, AssetEntity entity);
+
+  @Mapping(target = "creationDate", source = "uploadDate")
+  AssetEntity toEntity(Asset domain);
 
   default MediaType toMediaType(String contentType) {
     return MediaType.parseMediaType(contentType);
+  }
+
+  default String fromMediaType(MediaType mediaType) {
+    return mediaType.toString();
   }
 }

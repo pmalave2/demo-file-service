@@ -21,7 +21,7 @@ public class AssetEntity {
 
   @Id
   @Column
-  private UUID id;
+  private String id;
   @Column
   private String filename;
   @Column("contentType")

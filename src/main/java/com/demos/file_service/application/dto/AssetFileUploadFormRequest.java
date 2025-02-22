@@ -1,6 +1,6 @@
 package com.demos.file_service.application.dto;
 
-import org.springframework.web.multipart.MultipartFile;
+import org.springframework.http.codec.multipart.FilePart;
 
-public record AssetFileUploadFormRequest(MultipartFile file) {
+public record AssetFileUploadFormRequest(FilePart file) {
 }
