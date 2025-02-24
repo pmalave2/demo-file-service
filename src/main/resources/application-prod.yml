@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: file-service
+  r2dbc:
+    url: ${DB_CONNECTION_STRING}
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+  cloud:
+    azure:
+      storage:
+        blob:
+          account-name: ${BLOB_STORAGE_ACCOUNT_NAME}
+          endpoint: ${BLOB_STORAGE_ENDPOINT}
+          account-key: ${BLOB_STORAGE_ACCOUNT_KEY}
+          container-name: ${BLOB_STORAGE_CONTAINER_NAME}

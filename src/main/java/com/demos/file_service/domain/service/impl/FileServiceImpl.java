@@ -14,12 +14,14 @@ import org.springframework.http.codec.multipart.FilePart;
 import org.springframework.stereotype.Service;
 
 import com.demos.file_service.domain.Asset;
+import com.demos.file_service.domain.AssetFilterParams;
 import com.demos.file_service.domain.repository.PersistenceRepository;
 import com.demos.file_service.domain.repository.StorageRepository;
 import com.demos.file_service.domain.service.FileService;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @Slf4j
@@ -33,15 +35,15 @@ public class FileServiceImpl implements FileService {
   @Override
   public Mono<Asset> uploadFile(String filename, String encodedFile, String contentType) {
     return getAsset(filename, encodedFile, contentType)
-        .flatMap(persistenceRepository::save)
-        .doOnNext(elem -> storageRepository.saveAsset(elem).flatMap(persistenceRepository::save).subscribe());
+        .flatMap(persistenceRepository::insert)
+        .doOnNext(elem -> storageRepository.saveAsset(elem).flatMap(persistenceRepository::update).subscribe());
   }
 
   @Override
   public Mono<Asset> uploadFile(FilePart file) {
     return getAsset(file)
-        .flatMap(persistenceRepository::save)
-        .doOnNext(elem -> storageRepository.saveAsset(elem).flatMap(persistenceRepository::save).subscribe());
+        .flatMap(persistenceRepository::insert)
+        .doOnNext(elem -> storageRepository.saveAsset(elem).flatMap(persistenceRepository::update).subscribe());
   }
 
   private Mono<Asset> getAsset(String filename, String encodedFile, String contentType) {
@@ -85,5 +87,10 @@ public class FileServiceImpl implements FileService {
         .path(path)
         .uploadDate(LocalDateTime.now())
         .build();
+  }
+
+  @Override
+  public Flux<Asset> getAssets(AssetFilterParams params) {
+    return persistenceRepository.select(params);
   }
 }

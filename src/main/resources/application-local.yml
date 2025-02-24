@@ -1,4 +1,10 @@
 spring:
+  application:
+    name: file-service
+  r2dbc:
+    url: r2dbc:mariadb://localhost:3306/testDB
+    username: user
+    password: test123
   cloud:
     azure:
       storage:

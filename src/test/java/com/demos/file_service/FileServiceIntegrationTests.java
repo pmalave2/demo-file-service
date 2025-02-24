@@ -3,33 +3,40 @@ package com.demos.file_service;
 import static com.demos.file_service.TestFileServiceApplication.PROFILE;
 import static com.demos.file_service.application.http.AssetsController.ASSET_UPLOAD_URI;
 import static com.demos.file_service.application.http.AssetsController.BASE_URI;
+import static org.springframework.data.relational.core.query.Criteria.from;
+import static org.springframework.data.relational.core.query.Criteria.where;
+import static org.springframework.data.relational.core.query.Query.query;
 
+import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Base64;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.reactive.AutoConfigureWebTestClient;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.data.domain.Example;
-import org.springframework.data.domain.ExampleMatcher;
+import org.springframework.core.io.Resource;
+import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
+import org.springframework.data.relational.core.query.Criteria;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.r2dbc.connection.init.ResourceDatabasePopulator;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.DynamicPropertyRegistry;
-import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.reactive.server.WebTestClient;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.reactive.function.BodyInserters;
-import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.utility.DockerImageName;
 
 import com.demos.file_service.application.dto.AssetFileUploadRequest;
 import com.demos.file_service.domain.service.FileService;
 import com.demos.file_service.infrastructure.orm.entity.AssetEntity;
-import com.demos.file_service.infrastructure.orm.repositories.AssetRepository;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import io.r2dbc.spi.ConnectionFactory;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
@@ -46,22 +53,14 @@ class FileServiceIntegrationTests {
   @Autowired
   FileService fileService;
   @Autowired
-  AssetRepository assetsRepository;
+  R2dbcEntityTemplate template;
 
-  static GenericContainer<?> azurite = new GenericContainer<>(
-      DockerImageName.parse("mcr.microsoft.com/azure-storage/azurite:latest"))
-      .withExposedPorts(10000, 10001, 10002);
-
-  static {
-    azurite.start();
-  }
-
-  @DynamicPropertySource
-  static void registerAzuriteProperties(DynamicPropertyRegistry registry) {
-    var string = String.format("http://%s:%s/devstoreaccount1", azurite.getHost(),
-        azurite.getMappedPort(10000));
-    registry.add("spring.cloud.azure.storage.blob.endpoint",
-        () -> string);
+  @BeforeEach
+  void setUp(@Value("classpath:static/test-data.sql") Resource testDataSql,
+      @Autowired ConnectionFactory connectionFactory) {
+    var resourceDatabasePopulator = new ResourceDatabasePopulator();
+    resourceDatabasePopulator.addScript(testDataSql);
+    resourceDatabasePopulator.populate(connectionFactory).block();
   }
 
   @Test
@@ -79,19 +78,19 @@ class FileServiceIntegrationTests {
         .expectStatus().isAccepted()
         .expectHeader().contentType(MediaType.APPLICATION_JSON)
         .expectBody()
+        .consumeWith(System.out::println)
         .jsonPath("$.id").isNotEmpty();
 
-    assetsRepository.count().as(StepVerifier::create)
-        .expectNext(1L)
-        .verifyComplete();
-
-    var caseInsensitiveExampleMatcher = ExampleMatcher.matchingAny().withIgnoreCase().withMatcher("filename",
-        ExampleMatcher.GenericPropertyMatcher::exact)
-        .withMatcher("url",
-            ExampleMatcher.GenericPropertyMatcher::contains);
-    var example = Example.of(AssetEntity.builder().filename("test.txt").url("http").build(),
-        caseInsensitiveExampleMatcher);
-    assetsRepository.exists(example).as(StepVerifier::create)
+    var criterias = new ArrayList<Criteria>();
+    criterias.add(where(AssetEntity.Fields.filename).is("test.txt"));
+    criterias.add(where(AssetEntity.Fields.url).like("http%test.txt"));
+    Mono.delay(Duration.ofSeconds(5))
+        .then(
+            template.select(AssetEntity.class)
+                .matching(query(from(criterias)))
+                .exists())
+        .delayElement(Duration.ofSeconds(5))
+        .as(StepVerifier::create)
         .expectNext(Boolean.TRUE)
         .verifyComplete();
   }
@@ -110,10 +109,19 @@ class FileServiceIntegrationTests {
         .expectStatus().isAccepted()
         .expectHeader().contentType(MediaType.APPLICATION_JSON)
         .expectBody()
+        .consumeWith(System.out::println)
         .jsonPath("$.id").isNotEmpty();
 
-    assetsRepository.count().as(StepVerifier::create)
-        .expectNext(1L)
+    var criterias = new ArrayList<Criteria>();
+    criterias.add(where(AssetEntity.Fields.filename).is("tux.png"));
+    criterias.add(where(AssetEntity.Fields.url).like("http%tux.png"));
+    Mono.delay(Duration.ofSeconds(5))
+        .then(
+            template.select(AssetEntity.class)
+                .matching(query(from(criterias)))
+                .exists())
+        .as(StepVerifier::create)
+        .expectNext(Boolean.TRUE)
         .verifyComplete();
   }
 
@@ -126,7 +134,58 @@ class FileServiceIntegrationTests {
         .expectStatus().isOk()
         .expectHeader().contentType(MediaType.APPLICATION_JSON)
         .expectBody()
+        .consumeWith(System.out::println)
         .jsonPath("$").isArray()
-        .jsonPath("$").isNotEmpty();
+        .jsonPath("$").isNotEmpty()
+        .jsonPath("$.size()").isEqualTo(4);
+  }
+
+  @Test
+  void givenAssets_whenGetAssetsByUploadDateStart_thenShouldReturnListofAssets() {
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {
+      {
+        add("uploadDateStart", "2025-01-01");
+      }
+    };
+
+    webTestClient
+        .get()
+        .uri(uriBuilder -> uriBuilder
+            .path(BASE_URI)
+            .queryParams(params)
+            .build())
+        .exchange()
+        .expectStatus().isOk()
+        .expectHeader().contentType(MediaType.APPLICATION_JSON)
+        .expectBody()
+        .consumeWith(System.out::println)
+        .jsonPath("$").isArray()
+        .jsonPath("$").isEmpty();
+  }
+
+  @Test
+  void givenAssets_whenGetAssetsByUploadDateEndAndSortedAsc_thenShouldReturnListofAssets() {
+    MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {
+      {
+        add("uploadDateEnd", "2025-01-01");
+        add("sortDirection", "ASC");
+      }
+    };
+
+    webTestClient
+        .get()
+        .uri(uriBuilder -> uriBuilder
+            .path(BASE_URI)
+            .queryParams(params)
+            .build())
+        .exchange()
+        .expectStatus().isOk()
+        .expectHeader().contentType(MediaType.APPLICATION_JSON)
+        .expectBody()
+        .consumeWith(System.out::println)
+        .jsonPath("$").isNotEmpty()
+        .jsonPath("$.size()").isEqualTo(4)
+        .jsonPath("$[0].uploadDate").isEqualTo("2020-06-14T00:00:00")
+        .jsonPath("$[3].uploadDate").isEqualTo("2023-06-15T16:00:00");
   }
 }

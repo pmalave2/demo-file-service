@@ -1,7 +1,6 @@
 package com.demos.file_service.infrastructure.orm.entity;
 
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import org.springframework.data.annotation.Id;
 import org.springframework.data.relational.core.mapping.Column;
@@ -11,11 +10,13 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.FieldNameConstants;
 
 @AllArgsConstructor
 @Getter
 @Setter
 @Builder
+@FieldNameConstants
 @Table(name = "assets")
 public class AssetEntity {
 

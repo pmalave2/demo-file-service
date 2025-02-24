@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -18,8 +17,11 @@ import com.demos.file_service.application.dto.AssetFileUploadRequest;
 import com.demos.file_service.application.dto.AssetFileUploadResponse;
 import com.demos.file_service.application.dto.AssetGetResponse;
 import com.demos.file_service.domain.Asset;
+import com.demos.file_service.domain.AssetFilterParams;
+import com.demos.file_service.domain.mapper.AssetMapper;
 import com.demos.file_service.domain.service.FileService;
 
+import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -32,11 +34,13 @@ public class AssetsController {
   public static final String BASE_URI = "/api/mgmt/1/assets";
   public static final String ASSET_UPLOAD_URI = "/actions/upload";
 
+  private static AssetMapper mapper = AssetMapper.INSTANCE;
   private FileService fileService;
 
   @GetMapping
-  public Flux<AssetGetResponse> getMethodName(@RequestParam String param) {
-    return null;
+  public Flux<AssetGetResponse> get(@Valid AssetFilterParams params) {
+    return fileService.getAssets(params)
+        .map(mapper::toGetResponse);
   }
 
   @PostMapping(path = ASSET_UPLOAD_URI, consumes = MediaType.APPLICATION_JSON_VALUE)

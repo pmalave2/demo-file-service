@@ -1,0 +1,42 @@
+services:
+
+  db:
+    image: mariadb
+    restart: always
+    environment:
+      MARIADB_ROOT_PASSWORD: 12345678
+      MARIADB_USER: user
+      MARIADB_PASSWORD: test123
+      MARIADB_DATABASE: testDB
+
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: "azurite"
+    hostname: azurite
+    restart: always
+    volumes:
+      - ./docker/azurite-data:/data
+    ports:
+      - "10000:10000"
+      - "10001:10001"
+      - "10002:10002"
+
+  file-service:
+    container_name: "file-service"
+    build:
+      dockerfile: ./Dockerfile
+    env_file:
+      - ./docker/file-service.env
+    ports:
+      - 8081:8080
+    depends_on:
+      - db
+      - azurite

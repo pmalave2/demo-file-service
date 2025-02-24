@@ -1,0 +1,14 @@
+.git
+.firebase
+.editorconfig
+.vscode
+.mvn
+mvnw
+mvnw.cmd
+.env
+/target
+.gitignore
+*.zip
+*.md
+req.http
+Dockerfile
