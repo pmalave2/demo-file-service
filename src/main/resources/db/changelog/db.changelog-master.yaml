@@ -1,0 +1,42 @@
+databaseChangeLog:
+  - property:
+      dbms: mysql,mariadb,h2
+      name: u_id
+      value: "UUID()"
+  - objectQuotingStrategy: QUOTE_ALL_OBJECTS
+  - changeSet:
+      id: "1"
+      author: pavele
+      context: prod, test
+      changes:
+        - createTable:
+            tableName: assets
+            columns:
+              - column:
+                  name: id
+                  type: UUID
+                  defaultValueComputed: ${u_id}
+                  constraints:
+                    primaryKey: true
+                    nullable: false
+              - column:
+                  name: filename
+                  type: TEXT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: contentType
+                  type: TEXT
+              - column:
+                  name: size
+                  type: FLOAT
+                  constraints:
+                    nullable: false
+              - column:
+                  name: url
+                  type: TEXT
+              - column:
+                  name: creationDate
+                  type: TIMESTAMP
+                  constraints:
+                    nullable: false

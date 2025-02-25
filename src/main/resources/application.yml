@@ -1,0 +1,17 @@
+spring:
+  application:
+    name: file-service
+  data:
+    r2dbc:
+      repositories:
+        enabled: true
+server:
+  error:
+    include-message: always
+    include-stacktrace: on-param
+
+resilience4j.retry:
+  instances:
+    storageAzure:
+      maxAttempts: 3
+      waitDuration: 10s

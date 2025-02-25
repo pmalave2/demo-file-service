@@ -1,0 +1,23 @@
+server:
+  port: 8081
+spring:
+  r2dbc:
+    url: r2dbc:mariadb://localhost:3306/testDB
+    username: user
+    password: test123
+  liquibase:
+    url: jdbc:mariadb://localhost:3306/testDB
+    user: user
+    password: test123
+  cloud:
+    azure:
+      storage:
+        blob:
+          account-name: devstoreaccount1
+          endpoint: http://127.0.0.1:10000/devstoreaccount1
+          account-key: "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="
+          container-name: assets
+
+logging:
+  level:
+    com.demos.file_service: TRACE
