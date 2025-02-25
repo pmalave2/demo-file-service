@@ -45,7 +45,7 @@ public class AssetsController {
 
   @PostMapping(path = ASSET_UPLOAD_URI, consumes = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public Mono<AssetFileUploadResponse> post(@RequestBody AssetFileUploadRequest request) {
+  public Mono<AssetFileUploadResponse> post(@Valid @RequestBody AssetFileUploadRequest request) {
     return fileService.uploadFile(request.filename(), request.encodedFile(), request.contentType())
         .map(Asset::getId)
         .map(UUID::toString)
@@ -54,7 +54,7 @@ public class AssetsController {
 
   @PostMapping(path = ASSET_UPLOAD_URI, consumes = MediaType.MULTIPART_FORM_DATA_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
   @ResponseStatus(HttpStatus.ACCEPTED)
-  public Mono<AssetFileUploadResponse> post(@ModelAttribute AssetFileUploadFormRequest form) {
+  public Mono<AssetFileUploadResponse> post(@Valid @ModelAttribute AssetFileUploadFormRequest form) {
     return fileService.uploadFile(form.file())
         .map(Asset::getId)
         .map(UUID::toString)

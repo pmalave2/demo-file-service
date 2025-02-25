@@ -18,4 +18,4 @@ EXPOSE 8080
 
 USER newuser
 
-ENTRYPOINT ["java","-jar","app.jar"]
+ENTRYPOINT ["java","-Dreactor.schedulers.defaultBoundedElasticOnVirtualThreads=true","-jar","app.jar"]

@@ -8,12 +8,14 @@ services:
       MARIADB_USER: user
       MARIADB_PASSWORD: test123
       MARIADB_DATABASE: testDB
+    ports:
+      - 3306:3306
 
   adminer:
     image: adminer
     restart: always
     ports:
-      - 8080:8080
+      - 8082:8080
     depends_on:
       - db
 
@@ -31,6 +33,7 @@ services:
 
   file-service:
     container_name: "file-service"
+    restart: on-failure:10
     build:
       dockerfile: ./Dockerfile
     env_file:

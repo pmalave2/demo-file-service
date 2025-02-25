@@ -26,4 +26,13 @@ public class Asset {
   private long size;
   private LocalDateTime uploadDate;
   private Path path;
+
+  public static Asset buildAsset(String filename, String contentType, Path path) {
+    return Asset.builder()
+        .filename(filename)
+        .contentType(MediaType.valueOf(contentType))
+        .size(path.toFile().length())
+        .path(path)
+        .build();
+  }
 }

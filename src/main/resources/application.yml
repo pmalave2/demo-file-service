@@ -1,6 +1,10 @@
 spring:
   application:
     name: file-service
+  data:
+    r2dbc:
+      repositories:
+        enabled: true
 server:
   error:
     include-message: always

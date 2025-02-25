@@ -2,8 +2,6 @@ package com.demos.file_service.domain.service.impl;
 
 import java.io.IOException;
 import java.nio.file.Files;
-import java.nio.file.Path;
-import java.time.LocalDateTime;
 import java.util.Base64;
 import java.util.Objects;
 
@@ -23,6 +21,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+import reactor.core.scheduler.Schedulers;
 
 @Slf4j
 @AllArgsConstructor
@@ -47,46 +46,42 @@ public class FileServiceImpl implements FileService {
   }
 
   private Mono<Asset> getAsset(String filename, String encodedFile, String contentType) {
-    try {
-      var path = Files.createTempFile(null, "");
-      var decoder = Base64.getDecoder();
-      var decodedFile = decoder.decode(encodedFile);
-      Files.write(path, decodedFile);
+    return Mono.defer(() -> {
+      try {
+        var path = Files.createTempFile(null, "");
+        var decoder = Base64.getDecoder();
+        var decodedFile = decoder.decode(encodedFile);
+        Files.write(path, decodedFile);
 
-      log.info("File {} has been stored in {}", filename, path);
-      log.info("File content: {}", path.toFile().length());
+        log.trace("File '{}'' has been stored in '{}'", filename, path);
+        log.trace("File length: '{}'", path.toFile().length());
 
-      return Mono.just(buildAsset(filename, contentType, path));
-    } catch (IOException ex) {
-      return Mono.error(ex);
-    }
+        return Mono.just(Asset.buildAsset(filename, contentType, path));
+      } catch (IOException ex) {
+        return Mono.error(ex);
+      }
+    })
+        .subscribeOn(Schedulers.boundedElastic());
   }
 
   private Mono<Asset> getAsset(FilePart file) {
-    try {
-      var path = Files.createTempFile(null, "");
+    return Mono.defer(() -> {
+      try {
+        var path = Files.createTempFile(null, "");
+        DataBufferUtils.write(file.content(), path).block();
 
-      DataBufferUtils.write(file.content(), path).block();
-      log.info("File {} has been stored in {}", file.filename(), path);
-      log.info("File content: {}", path.toFile().length());
+        log.trace("File '{}'' has been stored in '{}'", file.filename(), path);
+        log.trace("File length: '{}'", path.toFile().length());
 
-      String contentType = Objects.requireNonNullElse(file.headers().getContentType(),
-          MediaTypeFactory.getMediaType(file.filename()).orElse(MediaType.APPLICATION_OCTET_STREAM)).toString();
+        var contentType = Objects.requireNonNullElse(file.headers().getContentType(),
+            MediaTypeFactory.getMediaType(file.filename()).orElse(MediaType.APPLICATION_OCTET_STREAM)).toString();
 
-      return Mono.just(buildAsset(file.filename(), contentType, path));
-    } catch (IOException ex) {
-      return Mono.error(ex);
-    }
-  }
-
-  private Asset buildAsset(String filename, String contentType, Path path) {
-    return Asset.builder()
-        .filename(filename)
-        .contentType(MediaType.valueOf(contentType))
-        .size(path.toFile().length())
-        .path(path)
-        .uploadDate(LocalDateTime.now())
-        .build();
+        return Mono.just(Asset.buildAsset(file.filename(), contentType, path));
+      } catch (IOException ex) {
+        return Mono.error(ex);
+      }
+    })
+        .subscribeOn(Schedulers.boundedElastic());
   }
 
   @Override

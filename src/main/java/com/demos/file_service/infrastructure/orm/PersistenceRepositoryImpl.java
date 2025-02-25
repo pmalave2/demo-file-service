@@ -7,6 +7,7 @@ import static org.springframework.data.relational.core.query.Query.query;
 import java.util.ArrayList;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.r2dbc.core.R2dbcEntityTemplate;
 import org.springframework.data.relational.core.query.Criteria;
@@ -35,14 +36,14 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
   public Mono<Asset> insert(Asset asset) {
     return template.insert(assetMapper.toEntity(asset))
         .map(elem -> assetMapper.updateDomainFromEntity(asset, elem))
-        .doOnSubscribe(sub -> log.info("Saving asset {}", asset));
+        .doOnSubscribe(sub -> log.trace("Saving asset {}", asset));
   }
 
   @Override
   public Mono<Asset> update(Asset asset) {
     return template.update(assetMapper.toEntity(asset))
         .map(elem -> assetMapper.updateDomainFromEntity(asset, elem))
-        .doOnSubscribe(sub -> log.info("Updating asset {}", asset));
+        .doOnSubscribe(sub -> log.trace("Updating asset {}", asset));
   }
 
   @Override
@@ -62,10 +63,10 @@ public class PersistenceRepositoryImpl implements PersistenceRepository {
     if (Objects.nonNull(params.getUploadDateEnd()))
       criterias.add(where(AssetEntity.Fields.creationDate).lessThanOrEquals(params.getUploadDateEnd()));
 
-    if (Objects.nonNull(params.getFilename()))
+    if (StringUtils.isNotBlank(params.getFilename()))
       criterias.add(where(AssetEntity.Fields.filename).like("%" + params.getFilename() + "%"));
 
-    if (Objects.nonNull(params.getFiletype()))
+    if (StringUtils.isNotBlank(params.getFiletype()))
       criterias.add(where(AssetEntity.Fields.contentType).like("%" + params.getFiletype() + "%"));
 
     return from(criterias);

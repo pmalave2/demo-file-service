@@ -1,20 +1,20 @@
-package com.demos.file_service;
+package com.demos.file_service.infrastructure.storage.azure.config;
 
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 
-@TestConfiguration
-public class TestConfig {
+@Configuration
+public class AzureBlobConfig {
 
   @Bean
-  public BlobContainerClient testBlobContainerAsyncClient(BlobServiceClient blobServiceClient,
+  BlobContainerClient testBlobContainerAsyncClient(BlobServiceClient blobServiceClient,
       @Value("${spring.cloud.azure.storage.blob.container-name}") String containerName) {
     var blobContainerClient = blobServiceClient.getBlobContainerClient(containerName);
-    blobContainerClient.create();
+    blobContainerClient.createIfNotExists();
     return blobContainerClient;
   }
 }

@@ -34,13 +34,12 @@ import org.springframework.web.reactive.function.BodyInserters;
 import com.demos.file_service.application.dto.AssetFileUploadRequest;
 import com.demos.file_service.domain.service.FileService;
 import com.demos.file_service.infrastructure.orm.entity.AssetEntity;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import io.r2dbc.spi.ConnectionFactory;
 import reactor.core.publisher.Mono;
 import reactor.test.StepVerifier;
 
-@Import({ TestcontainersConfiguration.class, TestConfig.class })
+@Import({ TestcontainersConfiguration.class })
 @SpringBootTest
 @AutoConfigureWebTestClient(timeout = "360000")
 @ActiveProfiles(PROFILE)
@@ -48,8 +47,6 @@ class FileServiceIntegrationTests {
 
   @Autowired
   WebTestClient webTestClient;
-  @Autowired
-  ObjectMapper jackson;
   @Autowired
   FileService fileService;
   @Autowired
@@ -64,7 +61,7 @@ class FileServiceIntegrationTests {
   }
 
   @Test
-  void givenAssets_whenUploadAsRest_thenShouldBeStored() {
+  void uploadAsRestShouldBeStored() {
     var encoder = Base64.getEncoder();
     var encodedFile = encoder.encodeToString("Hola Mundo\n".getBytes());
     var request = new AssetFileUploadRequest("test.txt", encodedFile, MediaType.TEXT_PLAIN_VALUE);
@@ -96,7 +93,7 @@ class FileServiceIntegrationTests {
   }
 
   @Test
-  void givenAssets_whenUploadAsForm_thenShouldBeStored() {
+  void uploadAsFormShouldBeStored() {
     var bodyBuilder = new MultipartBodyBuilder();
     bodyBuilder.part("file", new ClassPathResource("static/tux.png")).contentType(MediaType.IMAGE_PNG);
 
@@ -126,7 +123,7 @@ class FileServiceIntegrationTests {
   }
 
   @Test
-  void givenAssets_whenGetAssets_thenShouldReturnListofAssets() {
+  void getAssetsShouldReturnListofAssets() {
     webTestClient
         .get()
         .uri(BASE_URI)
@@ -141,10 +138,10 @@ class FileServiceIntegrationTests {
   }
 
   @Test
-  void givenAssets_whenGetAssetsByUploadDateStart_thenShouldReturnListofAssets() {
+  void getAssetsByUploadDateStartShouldReturnListofAssets() {
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {
       {
-        add("uploadDateStart", "2025-01-01");
+        add("uploadDateStart", "2025-01-01T00:00");
       }
     };
 
@@ -164,10 +161,10 @@ class FileServiceIntegrationTests {
   }
 
   @Test
-  void givenAssets_whenGetAssetsByUploadDateEndAndSortedAsc_thenShouldReturnListofAssets() {
+  void getAssetsByUploadDateEndAndSortedAscShouldReturnListofAssets() {
     MultiValueMap<String, String> params = new LinkedMultiValueMap<>() {
       {
-        add("uploadDateEnd", "2025-01-01");
+        add("uploadDateEnd", "2025-01-01T00:00");
         add("sortDirection", "ASC");
       }
     };

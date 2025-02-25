@@ -1,5 +1,8 @@
 package com.demos.file_service.domain.mapper;
 
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -29,10 +32,11 @@ public interface AssetMapper {
   Asset toDomain(AssetEntity entity);
 
   default MediaType toMediaType(String contentType) {
-    return MediaType.parseMediaType(contentType);
+    return StringUtils.isNotBlank(contentType) ? MediaType.parseMediaType(contentType)
+        : MediaType.APPLICATION_OCTET_STREAM;
   }
 
   default String fromMediaType(MediaType mediaType) {
-    return mediaType.toString();
+    return Objects.nonNull(mediaType) ? mediaType.toString() : MediaType.APPLICATION_OCTET_STREAM_VALUE;
   }
 }
