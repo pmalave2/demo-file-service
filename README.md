@@ -11,8 +11,7 @@ docker compose up
 ```
 <br />
 
-The service will receive requests throw the endpoint <a href="http://localhost:8081/">http://localhost:8081/</a>.
-
+The service will receive requests through the endpoint <a href="http://localhost:8081/">http://localhost:8081/</a>.
 <br />
 
 Use this <a href="postman/file-service.postman_collection.json">Postman Collection</a> (Environment <a href="postman/local.postman_environment.json">here</a>) to do calls to the endpoint using REST.
