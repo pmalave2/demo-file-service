@@ -4,6 +4,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -93,5 +94,14 @@ class FileServiceImplTest {
     StepVerifier.create(result)
         .expectNextMatches(asset -> "sample.txt".equals(asset.getFilename()))
         .verifyComplete();
+  }
+
+  @Test
+  void uploadFileFormEmptyShouldThrowIOException() {
+    when(filePart.content()).thenReturn(Flux.empty());
+
+    StepVerifier.create(fileServiceImpl.uploadFile(filePart))
+        .expectErrorMatches(ex -> ex instanceof IOException && ex.getMessage().contains("File is empty"))
+        .verify();
   }
 }

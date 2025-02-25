@@ -1,0 +1,131 @@
+{
+	"info": {
+		"_postman_id": "83370d53-6036-42cf-8393-7b1f58034c6f",
+		"name": "file-service",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "39058208"
+	},
+	"item": [
+		{
+			"name": "upload-file",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n    \"filename\": \"test.txt\",\r\n    \"contentType\": \"text/plain\",\r\n    \"encodedFile\": \"SG9sYSBNdW5kbwo=\"\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:{{port}}/api/mgmt/1/assets/actions/upload",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"mgmt",
+						"1",
+						"assets",
+						"actions",
+						"upload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "upload-file-form",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "file",
+							"value": "",
+							"type": "file"
+						}
+					],
+					"options": {
+						"formdata": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:{{port}}/api/mgmt/1/assets/actions/upload",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"mgmt",
+						"1",
+						"assets",
+						"actions",
+						"upload"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "upload-file",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:{{port}}/api/mgmt/1/assets",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "{{port}}",
+					"path": [
+						"api",
+						"mgmt",
+						"1",
+						"assets"
+					],
+					"query": [
+						{
+							"key": "uploadDateStart",
+							"value": "2020-05-10T00:00",
+							"disabled": true
+						},
+						{
+							"key": "uploadDateEnd",
+							"value": "2021-05-10T00:00",
+							"disabled": true
+						},
+						{
+							"key": "filename",
+							"value": "te",
+							"disabled": true
+						},
+						{
+							"key": "filetype",
+							"value": "p",
+							"disabled": true
+						},
+						{
+							"key": "sortDirection",
+							"value": "ASC",
+							"disabled": true
+						}
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}

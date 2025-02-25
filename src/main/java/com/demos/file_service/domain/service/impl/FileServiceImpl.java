@@ -69,6 +69,10 @@ public class FileServiceImpl implements FileService {
       try {
         var path = Files.createTempFile(null, "");
         DataBufferUtils.write(file.content(), path).block();
+        if(Files.size(path) == 0) {
+          Files.delete(path);
+          return Mono.error(new IOException("File is empty"));
+        }
 
         log.trace("File '{}'' has been stored in '{}'", file.filename(), path);
         log.trace("File length: '{}'", path.toFile().length());
