@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service;
 import com.azure.storage.blob.BlobContainerAsyncClient;
 import com.demos.file_service.domain.Asset;
 import com.demos.file_service.domain.repository.StorageRepository;
+import com.demos.file_service.infrastructure.exception.SaveAssetException;
 
 import io.github.resilience4j.retry.annotation.Retry;
 import lombok.AllArgsConstructor;
@@ -24,11 +25,17 @@ public class StorageRepositoryImpl implements StorageRepository {
   @Override
   public Mono<Asset> saveAsset(Asset asset) {
     var blobName = String.format("%s-%s", asset.getId().toString(), asset.getFilename());
-    var blobClient = blobContainerClient.getBlobAsyncClient(blobName);
-    asset.setUrl(blobClient.getBlobUrl());
+    try {
+      var blobClient = blobContainerClient.getBlobAsyncClient(blobName);
+      asset.setUrl(blobClient.getBlobUrl());
 
-    return blobClient.uploadFromFile(asset.getPath().toString())
-        .doOnSubscribe(sub -> log.trace("Uploading blob '{}' to Azure Storage", blobName))
-        .thenReturn(asset);
+      return blobClient.uploadFromFile(asset.getPath().toString())
+          .doOnSubscribe(sub -> log.trace("Uploading blob '{}' to Azure Storage", blobName))
+          .doOnError(ex -> log.error(SaveAssetException.MESSAGE + ": '{}'", blobName, ex))
+          .thenReturn(asset);
+    } catch (Exception ex) {
+      log.error(SaveAssetException.MESSAGE + ": '{}'", blobName, ex);
+      return Mono.error(new SaveAssetException(ex));
+    }
   }
 }

@@ -5,6 +5,9 @@ spring:
     r2dbc:
       repositories:
         enabled: true
+  threads:
+    virtual:
+      enabled: true
 server:
   error:
     include-message: always
@@ -13,5 +16,5 @@ server:
 resilience4j.retry:
   instances:
     storageAzure:
-      maxAttempts: 3
-      waitDuration: 10s
+      max-attempts: 3
+      wait-duration: 10s

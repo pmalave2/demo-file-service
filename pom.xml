@@ -90,6 +90,10 @@
 			<artifactId>resilience4j-reactor</artifactId>
 			<version>${resilience4j.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
