@@ -30,6 +30,7 @@ import reactor.core.publisher.Mono;
 public class PersistenceRepositoryImpl implements PersistenceRepository {
 
   private static AssetMapper assetMapper = AssetMapper.INSTANCE;
+
   private R2dbcEntityTemplate template;
 
   @Override

@@ -15,6 +15,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class AssetFilterParams {
+
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
   private LocalDateTime uploadDateStart;
   @DateTimeFormat(iso = DateTimeFormat.ISO.DATE)

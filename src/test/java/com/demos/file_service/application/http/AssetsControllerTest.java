@@ -41,6 +41,7 @@ class AssetsControllerTest {
 
   @Autowired
   WebTestClient webTestClient;
+
   @MockitoBean
   FileService fileService;
 
