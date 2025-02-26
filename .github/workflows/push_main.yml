@@ -1,8 +1,6 @@
-name: CI Build
+name: CI Build 'main'
 on:
-  push:
-    branches:
-      - '**'
+  - pull_request
 jobs:
   build:
     runs-on: ubuntu-latest
