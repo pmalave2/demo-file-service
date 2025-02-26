@@ -29,7 +29,7 @@ class PersistenceRepositoryImplTest {
   @Autowired
   PersistenceRepository persistenceRepository;
 
-    @BeforeEach
+  @BeforeEach
   void setUp(@Value("classpath:static/test-data-2.sql") Resource testDataSql,
       @Autowired ConnectionFactory connectionFactory) {
     var resourceDatabasePopulator = new ResourceDatabasePopulator();
@@ -69,7 +69,7 @@ class PersistenceRepositoryImplTest {
 
     persistenceRepository.insert(asset1).block();
     persistenceRepository.insert(asset2).block();
-    
+
     StepVerifier.create(persistenceRepository.select(new AssetFilterParams()))
         .expectNextCount(2)
         .verifyComplete();
