@@ -34,14 +34,17 @@ public class FileServiceImpl implements FileService {
   @Override
   public Mono<Asset> uploadFile(String filename, String encodedFile, String contentType) {
     return getAsset(filename, encodedFile, contentType)
-        .flatMap(persistenceRepository::insert)
-        .doOnNext(elem -> storageRepository.saveAsset(elem).flatMap(persistenceRepository::update).subscribe());
+        .flatMap(this::uploadFile);
   }
 
   @Override
   public Mono<Asset> uploadFile(FilePart file) {
     return getAsset(file)
-        .flatMap(persistenceRepository::insert)
+        .flatMap(this::uploadFile);
+  }
+
+  private Mono<Asset> uploadFile(Asset asset) {
+    return persistenceRepository.insert(asset)
         .doOnNext(elem -> storageRepository.saveAsset(elem).flatMap(persistenceRepository::update).subscribe());
   }
 
@@ -69,7 +72,7 @@ public class FileServiceImpl implements FileService {
       try {
         var path = Files.createTempFile(null, "");
         DataBufferUtils.write(file.content(), path).block();
-        if(Files.size(path) == 0) {
+        if (Files.size(path) == 0) {
           Files.delete(path);
           return Mono.error(new IOException("File is empty"));
         }
