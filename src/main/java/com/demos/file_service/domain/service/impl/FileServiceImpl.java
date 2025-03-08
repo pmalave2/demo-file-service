@@ -34,16 +34,16 @@ public class FileServiceImpl implements FileService {
   @Override
   public Mono<Asset> uploadFile(String filename, String encodedFile, String contentType) {
     return getAsset(filename, encodedFile, contentType)
-        .flatMap(this::uploadFile);
+        .flatMap(this::processAssetUpload);
   }
 
   @Override
   public Mono<Asset> uploadFile(FilePart file) {
     return getAsset(file)
-        .flatMap(this::uploadFile);
+        .flatMap(this::processAssetUpload);
   }
 
-  private Mono<Asset> uploadFile(Asset asset) {
+  private Mono<Asset> processAssetUpload(Asset asset) {
     return persistenceRepository.insert(asset)
         .doOnNext(elem -> storageRepository.saveAsset(elem).flatMap(persistenceRepository::update).subscribe());
   }
