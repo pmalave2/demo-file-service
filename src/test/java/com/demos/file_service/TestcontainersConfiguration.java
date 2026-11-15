@@ -6,7 +6,7 @@ import org.springframework.boot.testcontainers.service.connection.ServiceConnect
 import org.springframework.context.annotation.Bean;
 import org.springframework.test.context.DynamicPropertyRegistrar;
 import org.testcontainers.containers.GenericContainer;
-import org.testcontainers.containers.MariaDBContainer;
+import org.testcontainers.mariadb.MariaDBContainer;
 import org.testcontainers.utility.DockerImageName;
 
 @TestConfiguration(proxyBeanMethods = false)
@@ -21,8 +21,8 @@ public class TestcontainersConfiguration {
 
   @Bean
   @ServiceConnection
-  MariaDBContainer<?> mariaDbContainer() {
-    return new MariaDBContainer<>(DockerImageName.parse("mariadb:latest"));
+  MariaDBContainer mariaDbContainer() {
+    return new MariaDBContainer(DockerImageName.parse("mariadb:latest"));
   }
 
   @Bean

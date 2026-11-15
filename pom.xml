@@ -6,7 +6,7 @@
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>3.4.3</version>
+		<version>4.1.2</version>
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.demos</groupId>
@@ -28,14 +28,14 @@
 		<url />
 	</scm>
 	<properties>
-		<java.version>21</java.version>
+		<java.version>25</java.version>
 		<start-class>com.demos.file_service.FileServiceApplication</start-class>
-		<spring-cloud-azure.version>5.20.0</spring-cloud-azure.version>
+		<spring-cloud-azure.version>7.4.0</spring-cloud-azure.version>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<org.mapstruct.version>1.6.3</org.mapstruct.version>
 		<lombok-mapstruct-binding.version>0.2.0</lombok-mapstruct-binding.version>
-		<r2dbc-mariadb.version>1.4.1</r2dbc-mariadb.version>
-		<resilience4j.version>2.3.0</resilience4j.version>
+		<r2dbc-mariadb.version>1.4.2</r2dbc-mariadb.version>
+		<resilience4j.version>2.4.0</resilience4j.version>
 		<argLine></argLine>
 	</properties>
 	<dependencies>
@@ -61,11 +61,11 @@
 		</dependency>
 		<dependency>
 			<groupId>com.azure.spring</groupId>
-			<artifactId>spring-cloud-azure-starter-storage</artifactId>
+			<artifactId>spring-cloud-azure-starter-storage-blob</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.liquibase</groupId>
-			<artifactId>liquibase-core</artifactId>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-liquibase</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework</groupId>
@@ -78,11 +78,11 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-aop</artifactId>
+			<artifactId>spring-boot-starter-aspectj</artifactId>
 		</dependency>
 		<dependency>
 			<groupId>io.github.resilience4j</groupId>
-			<artifactId>resilience4j-spring-boot3</artifactId>
+			<artifactId>resilience4j-spring-boot4</artifactId>
 			<version>${resilience4j.version}</version>
 		</dependency>
 		<dependency>
@@ -124,6 +124,16 @@
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-webflux-test</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-webtestclient</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-testcontainers</artifactId>
 			<scope>test</scope>
 		</dependency>
@@ -139,17 +149,17 @@
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>junit-jupiter</artifactId>
+			<artifactId>testcontainers-junit-jupiter</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>mariadb</artifactId>
+			<artifactId>testcontainers-mariadb</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.testcontainers</groupId>
-			<artifactId>r2dbc</artifactId>
+			<artifactId>testcontainers-r2dbc</artifactId>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>

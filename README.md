@@ -19,7 +19,7 @@ Use <a href="http://localhost:8082/">http://localhost:8082/</a> to access to the
 To see the BLOBs uploaded to Azurite, use [Azure Storage Explorer](https://azure.microsoft.com/en-us/products/storage/storage-explorer).
 
 ## Run tests
-* Install [Java 21 JDK](https://adoptium.net/) and [Maven](https://maven.apache.org/download.cgi)
+* Install [Java 25 JDK](https://adoptium.net/) and [Maven](https://maven.apache.org/download.cgi)
 * run:
 ```bash
 mvn clean verify

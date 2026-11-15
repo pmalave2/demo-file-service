@@ -8,10 +8,10 @@ spring:
   threads:
     virtual:
       enabled: true
-server:
-  error:
-    include-message: always
-    include-stacktrace: on-param
+  web:
+    error:
+      include-message: always
+      include-stacktrace: on-param
 
 resilience4j.retry:
   instances:
